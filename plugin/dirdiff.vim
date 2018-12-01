@@ -211,6 +211,8 @@ function! <SID>DirDiff(srcA, srcB)
     let cmd = cmd.cmdarg." ".addarg." \"".DirDiffAbsSrcA."\" \"".DirDiffAbsSrcB."\""
     let cmd = cmd." > \"".DiffBuffer."\""
 
+    echom cmd
+
     echo "Diffing directories, it may take a while..."
     let error = <SID>DirDiffExec(cmd, 0)
     if (error == 0)
@@ -700,6 +702,12 @@ function! <SID>Copy(fileFromOrig, fileToOrig)
     if (isdirectory(fileFrom))
         let error = <SID>DirDiffExec(copydircmd, g:DirDiffInteractive)
     else
+        "Create parent target directory if it doesn't exists
+        let dirTo = fnamemodify(fileTo, ':h')
+        if !isdirectory(dirTo)
+          echom "Creating parent directory: " . dirTo . " for file: " . fileTo
+          call mkdir(dirTo, "p")
+        endif
         let error = <SID>DirDiffExec(copycmd, g:DirDiffInteractive)
     endif
     if (error != 0)
